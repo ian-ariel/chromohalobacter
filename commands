@@ -1,0 +1,42 @@
+#Quality analysis
+>NanoPlot --fastq raw.fastq -o qc_report
+
+#Read filter
+>filtlong --min_length 790 --keep_percent 90 raw.fastq > raw.filt.fastq
+
+#Assembly with NextDenovo. run.cfg:
+[General]
+job_type = local
+job_prefix = nextDenovo
+task = all
+rewrite = yes
+deltmp = yes
+rerun = 3
+parallel_jobs = 4
+input_type = ont
+read_type = raw
+input_fofn = $PWD/input.fofn
+workdir = $input/montagemND
+
+[correct_option]
+read_cutoff = 1k
+genome_size = 3.8m
+pa_correction = 2
+sort_options = -m 1g -t 2
+minimap2_options_raw = -t 8
+correction_options = -p 15
+
+[assemble_option]
+minimap2_options_cns = -t 8
+nextgraph_options = -a 1
+
+#Functional annotation with PGAP
+>./pgap.py -r -o pgap_salexigens -g /home/engebio-1/nd_bar2_ctgrefiner.fasta -s 'Chromohalobacter salexigens' -c 10 -m 13g
+
+#
+#
+
+
+
+#Pangenome
+https://github.com/modolon/Richelia_pipeline/tree/main
