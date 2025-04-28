@@ -32,7 +32,11 @@ nextgraph_options = -a 1
 
 #Functional annotation with PGAP
 >./pgap.py -r -o pgap_salexigens -g /home/engebio-1/nd_bar2_ctgrefiner.fasta -s 'Chromohalobacter salexigens' -c 10 -m 13g
+#METABOLIC
+perl METABOLIC-G.pl -in /home/engebio4/ian/faa/ -o /home/engebio4/ian/metabolic
 
+#GenoVi
+genovi -i anota_pgap/annot.gbk -o genovi -s complete --size --scale variable -t 'Chromohalobacter israelensis complete genome' -te --italic_words 2
 #
 #
 
