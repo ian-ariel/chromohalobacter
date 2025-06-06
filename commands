@@ -30,16 +30,14 @@ correction_options = -p 15
 minimap2_options_cns = -t 8
 nextgraph_options = -a 1
 
+#BUSCO
+>busco -i israelensis_completo.fasta -l halomonadaceae -m genome -o busco -f
+
 #Functional annotation with PGAP
 >./pgap.py -r -o pgap_salexigens -g /home/engebio-1/nd_bar2_ctgrefiner.fasta -s 'Chromohalobacter salexigens' -c 10 -m 13g
+
 #METABOLIC
-perl METABOLIC-G.pl -in /home/engebio4/ian/faa/ -o /home/engebio4/ian/metabolic
-
-#GenoVi
-genovi -i anota_pgap/annot.gbk -o genovi -s complete --size --scale variable -t 'Chromohalobacter israelensis complete genome' -te --italic_words 2
-#
-#
-
+>perl METABOLIC-G.pl -in /home/engebio4/ian/faa/ -o /home/engebio4/ian/metabolic
 
 
 #Pangenome
