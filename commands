@@ -33,8 +33,9 @@ nextgraph_options = -a 1
 #BUSCO
 >busco -i israelensis_completo.fasta -l halomonadaceae -m genome -o busco -f
 
-#Functional annotation with PGAP
+#Functional annotation
 >./pgap.py -r -o pgap_salexigens -g /home/engebio-1/nd_bar2_ctgrefiner.fasta -s 'Chromohalobacter salexigens' -c 10 -m 13g
+>DRAM.py annotate -i israelensis_completo.fasta -o dram_out
 
 #METABOLIC
 >perl METABOLIC-G.pl -in /home/engebio4/ian/faa/ -o /home/engebio4/ian/metabolic
