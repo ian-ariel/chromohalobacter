@@ -38,7 +38,3 @@ nextgraph_options = -a 1
 
 #METABOLIC
 >perl METABOLIC-G.pl -in /home/engebio4/ian/faa/ -o /home/engebio4/ian/metabolic
-
-
-#Pangenome
-https://github.com/modolon/Richelia_pipeline/tree/main
