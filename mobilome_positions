@@ -1,0 +1,84 @@
+###Adapted to other elements as well
+
+#Compare two .xlsx files holding the core genome positions and the mobilome elements positions to find superpositions.
+import pandas as pd
+
+def find_overlaps(crispr_file, core_file, output_file):
+    """Find overlapping regions between CRISPR regions and core genome positions.
+    
+    Args:
+        crispr_file: Path to CRISPR Excel file (columns 6=Start, 7=End)
+        core_file: Path to CorePositions Excel file
+        output_file: Path for output Excel file with overlaps (overlap_crispr.xlsx)
+    """
+    try:
+        # Read CRISPR data - using columns 6 (Start) and 7 (End)
+        crispr_df = pd.read_excel(crispr_file, header=0)
+        crispr_df.columns = list(crispr_df.columns[:5]) + ['Start', 'End'] + list(crispr_df.columns[7:])
+        crispr_regions = crispr_df[['Start', 'End']].to_records(index=False)
+        
+        # Read CorePositions data with explicit column names
+        core_df = pd.read_excel(core_file, header=0)
+        core_df.columns = core_df.columns[:1].tolist() + ['Start', 'End'] + core_df.columns[3:].tolist()
+        core_regions = core_df[['Start', 'End']].to_records(index=False)
+        
+        # Find overlapping regions
+        overlaps = []
+        for i_crispr, (crispr_start, crispr_end) in enumerate(crispr_regions, 1):
+            for i_core, (core_start, core_end) in enumerate(core_regions, 1):
+                # Check for overlap (more efficient calculation)
+                overlap_start = max(crispr_start, core_start)
+                overlap_end = min(crispr_end, core_end)
+                if overlap_start <= overlap_end:
+                    overlaps.append({
+                        'CRISPR_ID': i_crispr,
+                        'CRISPR_Start': crispr_start,
+                        'CRISPR_End': crispr_end,
+                        'Core_ID': i_core,
+                        'Core_Start': core_start,
+                        'Core_End': core_end,
+                        'Overlap_Start': overlap_start,
+                        'Overlap_End': overlap_end,
+                        'Overlap_Length': overlap_end - overlap_start + 1
+                    })
+        
+        # Create and save output if overlaps found
+        if overlaps:
+            overlap_df = pd.DataFrame(overlaps)
+            
+            # Reorder columns for better readability
+            column_order = [
+                'CRISPR_ID', 'CRISPR_Start', 'CRISPR_End',
+                'Core_ID', 'Core_Start', 'Core_End',
+                'Overlap_Start', 'Overlap_End', 'Overlap_Length'
+            ]
+            overlap_df = overlap_df[column_order]
+            
+            # Save to Excel with auto-adjusted column widths
+            with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+                overlap_df.to_excel(writer, index=False)
+                worksheet = writer.sheets['Sheet1']
+                for column in worksheet.columns:
+                    max_length = max(len(str(cell.value)) for cell in column)
+                    worksheet.column_dimensions[column[0].column_letter].width = max_length + 2
+            
+            print(f"Found {len(overlaps)} overlapping regions. Saved to {output_file}")
+            return overlap_df
+        else:
+            print("No overlapping regions found.")
+            return pd.DataFrame()  # Return empty DataFrame for consistency
+            
+    except Exception as e:
+        print(f"Error processing files: {str(e)}")
+        raise
+
+if __name__ == "__main__":
+    # Example usage with error handling
+    try:
+        crispr_file = "Crispr.xlsx"
+        core_file = "CorePositions.xlsx"
+        output_file = "Overlap_CRISPR.xlsx"
+        
+        result = find_overlaps(crispr_file, core_file, output_file)
+    except Exception as e:
+        print(f"Script failed: {str(e)}")
