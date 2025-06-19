@@ -1,0 +1,28 @@
+####Core genome positions####
+
+
+#Blast aminoacid sequences obtained from the core genome bin against the study's complete genome.
+#!/bin/bash
+
+# Create BLAST database for the genome assembly
+makeblastdb -in complete_genome.fasta -dbtype nucl -out genome_db
+
+# Run tBLASTn for all protein sequences
+mkdir -p tblastn_results
+
+# Split the protein sequences file into individual files (one per sequence)
+mkdir -p split_proteins
+awk '/^>/ {filename="split_proteins/"substr($0,2)".fasta"; print > filename; next} {print >> filename}' protein_sequences.fasta
+
+# Run tBLASTn for each protein sequence
+for file in split_proteins/*.fasta; do
+  base=$(basename "$file" .fasta)
+  tblastn -query "$file" -db genome_db \
+    -outfmt "6 qseqid sseqid sstart send evalue pident qframe sframe qseq sseq" \
+    -evalue 1e-5 -out tblastn_results/"${base}"_tblastn.txt
+done
+
+# Combine significant hits (e-value < 1e-5) from all tBLASTn results
+cat tblastn_results/*_tblastn.txt | awk '$5 < 1e-5' > significant_tblastn_hits.txt
+
+echo "Analysis complete. Significant hits saved to significant_tblastn_hits.txt"
