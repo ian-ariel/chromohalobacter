@@ -33,6 +33,12 @@ nextgraph_options = -a 1
 #BUSCO
 >busco -i israelensis_completo.fasta -l halomonadaceae -m genome -o busco -f
 
+#Dnaapler
+dnaapler all -i /home/engebio4/ian/israelensis_completo.fasta -o /home/engebio4/ian/dnaaplerOUT -p israelensis -t 6
+
+#Circlator
+docker run --rm -it -v /home/engebio4/ian:/data sangerpathogens/circlator   circlator all /data/dnaaplerOUT/israelensis_reoriented.fasta /data/brutas/barcode02-20260615T123322Z-3-001/barcode02/bar2FILT.fastq /data/circlatorAFTER
+
 #Functional annotation
 >./pgap.py -r -o pgap_salexigens -g /home/engebio-1/nd_bar2_ctgrefiner.fasta -s 'Chromohalobacter salexigens' -c 10 -m 13g
 >DRAM.py annotate -i israelensis_completo.fasta -o dram_out
